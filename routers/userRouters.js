@@ -4,6 +4,7 @@ const multer = require('multer')
 const sharp = require('sharp')
 // U S E R
 const User = require('../models/userModels')
+var cors = require('cors');
 
 
 // multer configuration
@@ -40,17 +41,19 @@ router.post('/users/avatar/:userid', upload.single('avatar'), async (req,res) =>
 })
 
 // Create one User
-router.post('/users',(req,res) => {
-
+router.options('/users', cors()) 
+router.post('/users', cors(),async(req,res) => {
+try {
     const user = new User(req.body)
-     user.save()
-        .then(()=> res.send(user))
-        .catch((err) => {res.send(err)})
+    await user.save()
+} catch (error) {
+    res.send(error)
+}
 
 })
 
 // reade One User
-router.get('/users/:userid', async (req,res)=> {
+router.get('/users/:userid' ,async (req,res)=> {
     try{
         const resp = await User.findById(req.params.userid)
         res.send({
@@ -63,11 +66,11 @@ router.get('/users/:userid', async (req,res)=> {
 })
 
 // read All user
-router.get('/users', async (req,res)=> {
+router.get('/users', cors(), async (req,res)=> {
     try{
         const resp = await User.find({})
         res.send(resp)
-    }catch(e){
+    }catch(err){
         res.send(err)
     }
 })
@@ -119,12 +122,13 @@ router.patch('/users/:userid', async (req,res)=> {
 
 
 // Login 
-router.post('/users/login', async(req,res)=>{
+router.options('/users/login', cors())
+router.post('/users/login', cors(), async(req,res)=>{
     try {
         let result = await User.login(req.body.email, req.body.password)
         res.send({
+                data : result,
                 condition : "berhasil login ",
-                pesan : result
             })
     } catch (error) {
         res.send(error.message)

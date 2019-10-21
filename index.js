@@ -2,6 +2,7 @@ const express = require('express')
 const mongoose = require('mongoose')
 const userRouter = require('./routers/userRouters')
 const taskRouter = require('./routers/taskRouter')
+var cors = require('cors');
 
 
 const app = express()
@@ -28,7 +29,7 @@ app.use(function(req, res, next) {
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     next();
   });
-  
+app.use(cors())
 
 app.get('/', (req,res)=>{
     res.send(`<h1> API Running at ${port}</h1>`)

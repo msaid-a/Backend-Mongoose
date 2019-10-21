@@ -120,7 +120,7 @@ userSchema.statics.login = async(email,password) =>{
     if(!result){
         throw new Error("User atau Password Salah")
     }
-    return `Hai ${user.name}`
+    return user
 }
 
 const User = mongoose.model('User', userSchema)

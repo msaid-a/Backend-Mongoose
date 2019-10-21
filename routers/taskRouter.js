@@ -5,8 +5,12 @@ const router = new express.Router()
 // T A S K 
 const Task = require('../models/taskModels')
 const User = require('../models/userModels')
+
+const cors = require('cors')
+
 // Create Task
-router.post('/tasks/:userid', async(req,res) => {
+router.options('/tasks/:userid', cors())
+router.post('/tasks/:userid', cors() ,async(req,res) => {
     
     try {
         let user = await User.findById(req.params.userid)
@@ -41,7 +45,8 @@ router.post('/tasks/:userid', async(req,res) => {
 
 
 // Update
-router.patch('/tasks/:taskid', async(req, res) => {
+router.options('/tasks/:taskid', cors())
+router.patch('/tasks/:taskid',cors(), async(req, res) => {
     let update = Object.keys(req.body)
     let allowedUpdates= ['description', 'completed']
     let result = update.every(update => allowedUpdates.includes(update))
@@ -64,7 +69,7 @@ router.patch('/tasks/:taskid', async(req, res) => {
 })
 
 // read all own task 
-router.get('/tasks/:userid', async (req, res) => {
+router.get('/tasks/:userid' ,cors(), async (req, res) => {
     try {
         let user = await User.find({_id: req.params.userid}).populate({path:'tasks'}).exec()
         res.send(user[0].tasks)

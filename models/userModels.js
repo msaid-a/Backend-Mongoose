@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const validator = require('validator')
 const bcrypt = require('bcryptjs')
+const uniqueValidator = require('mongoose-unique-validator')
 
 const userSchema = new mongoose.Schema({
 
@@ -112,7 +113,7 @@ userSchema.statics.login = async(email,password) =>{
     if(!user){
         throw new Error("User atau Password Salah")
     }
-
+    replace()
     // Bandingkan password input dari input user dengan yang ada di database
     // result = true/false
     let result = await bcrypt.compare(password, user.password)
@@ -122,6 +123,10 @@ userSchema.statics.login = async(email,password) =>{
     }
     return user
 }
+
+
+userSchema.plugin(uniqueValidator, {message: "{PATH} '{VALUE}' sudah digunakan"})
+// {PATH} adalah field yang ngalami duplicate
 
 const User = mongoose.model('User', userSchema)
 

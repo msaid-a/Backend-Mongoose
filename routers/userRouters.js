@@ -47,7 +47,7 @@ try {
     const user = new User(req.body)
     await user.save()
 } catch (error) {
-    res.send(error)
+    res.send(error.errors[Object.keys(error.errors)[0]].message)
 }
 
 })

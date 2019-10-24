@@ -10,7 +10,7 @@ const port = process.env.PORT || 2019 // Port Heroku atau Localhost
 const URL = 'mongodb+srv://said:Indonesiaku!@bdg-mongoose-pj0ka.mongodb.net/bdg-mongoose?retryWrites=true&w=majority'
 const URL_local = 'mongodb://localhost:27017/bdg-mongoose'
 
-mongoose.connect(URL_local, {
+mongoose.connect(URL, {
     // Menguunakan parse baru
     useNewUrlParser : true,
     // menggunakan method baru 'Create Index' untuk membuat index setiap kaliinput sebuah data

@@ -94,9 +94,11 @@ userSchema.methods.toJSON = function (){
 userSchema.pre('save', async function(next){
     // mengubah password yang di input dari user kedalam bentuk lain
    let user = this
-
+   if (!this.isModified("password")) {
+       return next();
+   }
+    return user.password = await bcrypt.hash(user.password, 8)
     // Hash Password
-    user.password = await bcrypt.hash(user.password, 8)
 
     // Untuk kemudian menjalankan save 
     next()
@@ -113,7 +115,7 @@ userSchema.statics.login = async(email,password) =>{
     if(!user){
         throw new Error("User atau Password Salah")
     }
-    replace()
+
     // Bandingkan password input dari input user dengan yang ada di database
     // result = true/false
     let result = await bcrypt.compare(password, user.password)

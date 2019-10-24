@@ -41,13 +41,12 @@ router.post('/users/avatar/:userid', upload.single('avatar'), async (req,res) =>
 })
 
 // Create one User
-router.options('/users', cors()) 
-router.post('/users', cors(),async(req,res) => {
+router.post('/users', async(req,res) => {
 try {
     const user = new User(req.body)
     await user.save()
 } catch (error) {
-    res.send(error.errors[Object.keys(error.errors)[0]].message)
+    res.send({ error:error.errors[Object.keys(error.errors)[0]].message})
 }
 
 })
@@ -58,7 +57,7 @@ router.get('/users/:userid' ,async (req,res)=> {
         const resp = await User.findById(req.params.userid)
         res.send({
             resp,
-            avatar : `http://localhost:2022/users/avatar/${req.params.userid}`
+            avatar : `http://localhost:2019/users/avatar/${req.params.userid}`
         })
     }catch(err){
         res.send(err)
@@ -66,7 +65,7 @@ router.get('/users/:userid' ,async (req,res)=> {
 })
 
 // read All user
-router.get('/users', cors(), async (req,res)=> {
+router.get('/users',  async (req,res)=> {
     try{
         const resp = await User.find({})
         res.send(resp)
@@ -91,28 +90,42 @@ router.delete('/users/:userid', async (req,res)=> {
 
 // update Profile
 
-router.patch('/users/:userid', async (req,res)=> {
+router.patch('/users/:userid', upload.single ('avatar') ,async (req,res)=> {
     let update = Object.keys(req.body) //[name, email, ...]
     const allowedUpdates = ['name', 'email', 'password', 'age']
 
+    if(!req.file){
+        update.splice(update.indexOf('avatar',1))
+    }
+    
     let hasil = update.every(update => {
         return allowedUpdates.includes(update)
     })
 
     if(!hasil){
-        return res.send({err: "Invalid Request"})
+        return res.send(hasil)
     }
 
     try{
+        // Ger user untuk edit
         let user = await User.findById(req.params.userid)
-        // update
+        // update untuk name, password, email, age
+        if(req.body.password == ''){
+             update.splice(update.indexOf('password'),1)
+        }
         update.forEach(val => {
             user[val] =req.body[val]
         })
+
+        // // edit data untuk image
+        if(Object.keys(req).includes('file')){
+            let buffer = await sharp(req.file.buffer).resize({width:250}).png().toBuffer()
+            user.avatar = buffer
+        }
         await user.save()
-        res.send('done di update')
+        res.send(user)
     }catch(err){
-        res.send(err)
+        res.send(err.message)
     }
 })
 
@@ -122,7 +135,6 @@ router.patch('/users/:userid', async (req,res)=> {
 
 
 // Login 
-router.options('/users/login', cors())
 router.post('/users/login', cors(), async(req,res)=>{
     try {
         let result = await User.login(req.body.email, req.body.password)
@@ -131,7 +143,7 @@ router.post('/users/login', cors(), async(req,res)=>{
                 condition : "berhasil login ",
             })
     } catch (error) {
-        res.send(error.message)
+        res.send({error: error.message})
     }
 })
 

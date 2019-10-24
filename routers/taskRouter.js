@@ -9,13 +9,12 @@ const User = require('../models/userModels')
 const cors = require('cors')
 
 // Create Task
-router.options('/tasks/:userid',)
 router.post('/tasks/:userid' ,async(req,res) => {
     
     try {
         let user = await User.findById(req.params.userid)
         let task =  new Task ({
-            description : req.body.description,
+         ...req.body,
             owner : user._id
         })
         // simpan _id task yang baru ke array task pada user 
@@ -87,7 +86,7 @@ router.delete('/tasks/:taskid', async(req, res) =>{
         
         // Delete deltetedTask id, menghapus id task yang sudah di hapus 
         let user = await User.findById(task.owner)
-        let index = user.tasks.indexOf(task._id)
+        let index = user.tasks.indexOf(req.params.taskid)
         user.tasks.splice(index,1)
         await user.save()
         res.send({deletedTask: task})

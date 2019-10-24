@@ -21,6 +21,7 @@ mongoose.connect(URL_local, {
     useUnifiedTopology: true
 })
 
+app.use(cors())
 app.use(express.json())
 app.use(userRouter)
 app.use(taskRouter)
@@ -31,7 +32,6 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use(cors())
 
 app.get('/', (req,res)=>{
     res.send(`<h1> API Running at ${port}</h1>`)
